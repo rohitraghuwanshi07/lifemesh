@@ -1,1 +1,0 @@
-print("LifeMesh is starting!")
