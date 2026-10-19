@@ -1,0 +1,6 @@
+services:
+  db: {image: pgvector/pgvector:pg16, environment: {POSTGRES_USER: lifemesh, POSTGRES_PASSWORD: lifemesh, POSTGRES_DB: lifemesh}, volumes: [pg:/var/lib/postgresql/data]}
+  redis: {image: redis:7-alpine}
+  api: {build: ., env_file: .env, depends_on: [db, redis], ports: ["8000:8000"]}
+  worker: {build: ., env_file: .env, command: celery -A app.worker worker -B -l info, depends_on: [db, redis]}
+volumes: {pg: {}}

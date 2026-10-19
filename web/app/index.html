@@ -1,0 +1,116 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LifeMesh</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#efede6;--tx:#0c0d14;--mu:#6b6c78;--ln:rgba(12,13,20,.2);--blue:#2f55f0;--vio:#7c4dff;--amb:#c46f00;--red:#cc2f4b;--grn:#0f7d58}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#090a12;--tx:#ecebe4;--mu:#8e90a3;--ln:rgba(236,235,228,.2);--blue:#5a86ff;--vio:#a37bff;--amb:#ffb454;--red:#ff6482;--grn:#3ddc97}}
+:root[data-theme="dark"]{--bg:#090a12;--tx:#ecebe4;--mu:#8e90a3;--ln:rgba(236,235,228,.2);--blue:#5a86ff;--vio:#a37bff;--amb:#ffb454;--red:#ff6482;--grn:#3ddc97}
+:root{--t:var(--tx);--m:var(--mu);--l:var(--ln);--b:var(--blue);--v:var(--vio);--ok:var(--grn);--w:var(--amb);--bad:var(--red);--p:color-mix(in srgb,var(--tx) 5%,transparent)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:400 15px/1.5 "Instrument Sans",system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
+main{max-width:1100px;margin:0 auto;padding:22px 24px 80px}
+h1,h2,h3,.d{font-family:Syne,system-ui,sans-serif;font-weight:800;letter-spacing:-.04em;margin:0}h3{font-size:20px;line-height:1.05;margin-bottom:6px}
+a{color:inherit}.m,.lb{color:var(--mu);font-size:13px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:26px}
+.wm{font-size:24px;text-decoration:none;display:flex;align-items:center;gap:14px}
+.shape{width:30px;height:30px;background:linear-gradient(135deg,var(--blue),var(--vio));clip-path:polygon(0 0,100% 0,100% 100%,0 100%);transition:width .8s cubic-bezier(.7,0,.2,1),height .8s cubic-bezier(.7,0,.2,1),border-radius .8s cubic-bezier(.7,0,.2,1),clip-path .8s cubic-bezier(.7,0,.2,1)}
+.shape[data-f="0"]{width:20px;height:34px;border-radius:5px}.shape[data-f="1"]{width:40px;height:22px;border-radius:5px}.shape[data-f="2"]{width:30px;height:30px;border-radius:50%}.shape[data-f="3"]{width:36px;height:32px;border-radius:0;clip-path:polygon(50% 0,50% 0,100% 100%,0 100%)}
+.tabs{display:flex;gap:22px;overflow-x:auto;border-bottom:1px solid var(--ln);margin-bottom:6px;scrollbar-width:none}
+.tab{background:none;border:0;border-radius:0;padding:10px 0 12px;color:var(--mu);font:500 15px "Instrument Sans",sans-serif;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px}.tab .ix{font-size:11px;margin-right:6px;opacity:.7}
+.tab:hover{background:none;color:var(--tx)}.tab[aria-selected=true]{color:var(--tx);border-bottom-color:var(--tx)}
+.hd{font-size:clamp(46px,9vw,120px);line-height:.9;margin:22px 0 28px}
+.view{animation:in .6s cubic-bezier(.2,.8,.2,1)}@keyframes in{from{opacity:0;transform:translateY(18px)}}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--tx);background:transparent;border-radius:99px;padding:8px 18px;font-weight:500;transition:background .25s,color .25s,border-color .25s}
+button:hover{background:var(--tx);color:var(--bg)}button.pri{background:var(--tx);color:var(--bg)}button.pri:hover{background:linear-gradient(120deg,var(--blue),var(--vio));border-color:transparent;color:#fff}
+button.bad{border-color:var(--red);color:var(--red)}button.bad:hover{background:var(--red);color:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+input,select{background:transparent;border:0;border-bottom:1px solid var(--tx);border-radius:0;padding:10px 0;width:100%}select{width:auto;padding:8px 4px}input[type=checkbox]{width:auto;accent-color:var(--blue)}
+.c{border-top:1px solid var(--ln);padding:16px 0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}@media(max-width:640px){.two{grid-template-columns:1fr}}
+.c.old,.c.new{border-top:0;border-left:3px solid;padding:6px 0 6px 14px}.old{border-color:var(--red)}.new{border-color:var(--grn)}
+.pill{font-size:12px;padding:2px 10px;border-radius:99px;margin-right:8px;border:1px solid currentColor;color:var(--blue);background:transparent}.pill.w{color:var(--amb)}.pill.b{color:var(--red)}.pill.g{color:var(--grn)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+#msg{padding:10px 14px;border-left:3px solid var(--amb);margin-bottom:14px;display:none;background:var(--p)}
+svg{max-width:100%}
+.auth{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:end;min-height:70vh}.auth h2{font-size:clamp(56px,14vw,190px);line-height:.85}@media(max-width:760px){.auth{grid-template-columns:1fr}}
+#cur{position:fixed;left:0;top:0;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#fff;mix-blend-mode:difference;z-index:200;pointer-events:none}@media(pointer:coarse){#cur{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><main>
+<div id="cur"></div><header><a href="/" class="d wm"><span class="shape" id="shape" data-f="0" aria-hidden="true"></span>(LifeMesh)</a><div class="row" id="top"></div></header>
+<div id="msg" role="status"></div><div id="app"></div></main>
+<script>
+// All server text is inserted with textContent (emails are untrusted).
+const h=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,v]of Object.entries(a)){if(x==="on")for(const[n,f]of Object.entries(v))e.addEventListener(n,f);else if(x==="class")e.className=v;else e.setAttribute(x,v)}k.flat().forEach(c=>e.append(c instanceof Node?c:document.createTextNode(c??"")));return e};
+const $=id=>document.getElementById(id);let tab="brief",me=false;
+async function api(p,o={}){const csrf=(document.cookie.match(/csrf=([^;]+)/)||[])[1]||"";const r=await fetch(p,{credentials:"same-origin",method:o.method||"GET",headers:{"X-CSRF-Token":csrf,...(o.json?{"Content-Type":"application/json"}:{})},body:o.json?JSON.stringify(o.json):o.body});let j={};try{j=await r.json()}catch{}if(!r.ok)throw new Error(typeof j.detail==="string"?j.detail:"Request failed ("+r.status+")");return j}
+const say=(t)=>{const m=$("msg");m.textContent=t;m.style.display=t?"block":"none"};
+const fmt=d=>d?new Date(d).toLocaleString():"no date";
+const act=(fn,re=true)=>async()=>{try{say("");await fn();if(re)await render()}catch(e){say(e.message)}};
+function auth(){const e=h("input",{type:"email",placeholder:"Email","aria-label":"Email"}),p=h("input",{type:"password",placeholder:"Password (10+ characters)","aria-label":"Password"});
+const go=path=>act(async()=>{await api(path,{method:"POST",json:{email:e.value,password:p.value}});me=true});
+return h("div",{class:"auth view"},h("div",{},h("span",{class:"lb"},"(Personal Intelligence System)"),h("h2",{class:"d"},"Sign",h("br"),"in.")),h("div",{},h("p",{class:"m"},"Your data stays private to your account. Nothing is connected until you choose."),e,h("br"),p,h("div",{class:"row",style:"margin-top:18px"},h("button",{class:"pri",on:{click:go("/auth/login")}},"Sign in"),h("button",{on:{click:go("/auth/register")}},"Create account"))))}
+const V={
+async brief(){const b=await api("/briefing");if(b.empty)return h("div",{class:"c"},h("h3",{},"Nothing synced yet"),h("p",{class:"m"},"Connect Google or Microsoft in Integrations, or upload a notice in Documents."));
+return h("div",{},h("div",{class:"c"},h("h3",{},"Today"),b.today.length?b.today.map(x=>h("div",{},x)):h("span",{class:"m"},"No events today.")),
+...b.conflicts.map(c=>h("div",{class:"c"},h("span",{class:"pill w"},"Conflict"),c.join("  overlaps  "))),
+h("div",{class:"c"},h("h3",{},"Next tasks"),b.tasks.map(t=>h("div",{},t.title," ",h("span",{class:"m"},fmt(t.due_at))))),h("p",{class:"m"},`${b.alerts} open alert(s). Built from ${b.generated_from.events} events and ${b.generated_from.tasks} tasks.`))},
+async alerts(){const [a,an]=await Promise.all([api("/alerts"),api("/risk/anomalies")]);const out=[];if(!a.length)out.push(h("div",{class:"c"},"No open alerts."));
+for(const x of a){const d=x.detail,c=h("div",{class:"c"},h("span",{class:"pill "+(x.kind==="risk"?"b":"w")},x.kind),h("b",{},x.title));
+if(x.kind==="change"){c.append(h("div",{class:"two",style:"margin-top:8px"},h("div",{class:"c old"},h("span",{class:"pill b"},"Before"),h("div",{},fmt(d.old.value)),h("div",{class:"m"},"“"+d.old.evidence+"”")),h("div",{class:"c new"},h("span",{class:"pill g"},"After"),h("div",{},fmt(d.new.value)),h("div",{class:"m"},"“"+d.new.evidence+"”"))),h("div",{class:"m"},d.affected_task_ids.length+" linked task(s) updated."))}
+else{c.append(h("div",{class:"m"},`Rule score ${d.score}/100 (${d.level}). ${d.note||""}`),...(d.factors||[]).map(f=>h("div",{class:"m"},`+${f.points} · ${f.reason}`)),h("div",{class:"m"},d.verify||""))}
+c.append(h("div",{style:"margin-top:8px"},h("button",{on:{click:act(()=>api(`/alerts/${x.id}/resolve`,{method:"PATCH"}))}},"Mark reviewed")));out.push(c)}
+out.push(h("div",{class:"c"},h("h3",{},"Statistical anomalies"),an.status!=="ok"?h("span",{class:"m"},`Needs ${an.needed} emails to learn your normal pattern (have ${an.have}).`):an.items.map(i=>h("div",{},`Score ${i.score}: `,h("span",{class:"m"},i.because.join("; "))))));return h("div",{},out)},
+async tasks(){const t=await api("/tasks"),ti=h("input",{placeholder:"New task","aria-label":"New task"});
+return h("div",{},h("div",{class:"row",style:"margin-bottom:12px"},ti,h("button",{class:"pri",on:{click:act(()=>ti.value&&api("/tasks",{method:"POST",json:{title:ti.value}}))}},"Add task")),
+t.length?t.map(x=>h("div",{class:"c row"},h("div",{style:"flex:1"},h("b",{},x.title),h("div",{class:"m"},"Due "+fmt(x.due_at)+" · "+x.status)),
+x.status==="proposed"?h("button",{class:"pri",on:{click:act(()=>api(`/tasks/${x.id}/open`,{method:"PATCH"}))}},"Approve"):x.status==="open"?h("button",{on:{click:act(()=>api(`/tasks/${x.id}/done`,{method:"PATCH"}))}},"Mark done"):h("span",{class:"pill g"},"Done"))):h("div",{class:"c"},"No tasks yet. Proposed tasks appear after emails or documents are read."))},
+async ask(){const q=h("input",{placeholder:"e.g. When is my next interview?","aria-label":"Question"}),o=h("div");
+const go=act(async()=>{const r=await api("/ask",{method:"POST",json:{question:q.value}});o.replaceChildren(h("div",{class:"c"},h("span",{class:"pill "+(r.status==="no_evidence"?"w":"g")},r.status),r.answer),...r.citations.map(c=>h("div",{class:"c"},h("span",{class:"pill"},c.type+(c.version?" · "+c.version:"")),c.flag?h("span",{class:"pill b"},c.flag):"",h("div",{class:"m"},"“"+c.quote+"”"))))},false);
+q.addEventListener("keydown",e=>e.key==="Enter"&&go());return h("div",{},h("div",{class:"row"},q,h("button",{class:"pri",on:{click:go}},"Ask")),h("p",{class:"m"},"Answers quote your stored records and cite them. If there is no evidence, it says so."),o)},
+async integ(){const d=await api("/integrations"),box=h("div");
+const conn=(p,l)=>h("button",{class:"pri",on:{click:act(async()=>{location.href=(await api(`/integrations/${p}/connect`)).url})}},"Connect "+l);
+box.append(h("div",{class:"row",style:"margin-bottom:12px"},conn("google","Google"),conn("microsoft","Microsoft")),h("p",{class:"m"},"Read-only access. If a provider is not configured on the server, connecting shows an error and nothing is marked connected."));
+if(!d.accounts.length)box.append(h("div",{class:"c"},"No accounts connected."));
+for(const a of d.accounts){const p=(k,v)=>act(()=>api(`/integrations/${a.id}`,{method:"PATCH",json:{[k]:v}}));
+box.append(h("div",{class:"c"},h("b",{},a.email)," ",h("span",{class:"pill "+(a.status==="active"?"g":"b")},a.status),h("div",{class:"m"},"Scopes: "+(a.scopes.map(s=>s.split("/").pop()).join(", ")||"none")),a.last_error?h("div",{class:"m"},a.last_error):"",
+h("div",{class:"row",style:"margin-top:8px"},h("label",{},h("input",{type:"checkbox",style:"width:auto",...(a.sync_gmail?{checked:""}:{}),on:{change:e=>p("sync_gmail",e.target.checked)()}})," Mail"),h("label",{},h("input",{type:"checkbox",style:"width:auto",...(a.sync_calendar?{checked:""}:{}),on:{change:e=>p("sync_calendar",e.target.checked)()}})," Calendar"),
+h("select",{style:"width:auto","aria-label":"Sync frequency",on:{change:e=>p("sync_minutes",+e.target.value)()}},[5,15,60,360].map(n=>h("option",{value:n,...(n===a.sync_minutes?{selected:""}:{})},"every "+n+" min"))),
+h("button",{on:{click:act(async()=>{const r=await api(`/integrations/${a.id}/sync`,{method:"POST"});say(`Synced ${r.emails} emails, ${r.events} events.`)})}},"Sync now"),
+h("button",{on:{click:act(async()=>{await api(`/integrations/${a.id}/watch`,{method:"POST"});say("Push notifications requested.")})}},"Enable push"),
+h("button",{class:"bad",on:{click:act(async()=>{if(confirm("Revoke access and disconnect?"))await api(`/integrations/${a.id}`,{method:"DELETE"})})}},"Disconnect"))))}return box},
+async docs(){const f=h("input",{type:"file",accept:".txt,.md,.pdf,.png,.jpg,.jpeg","aria-label":"File"});
+return h("div",{},h("div",{class:"c"},h("h3",{},"Upload a notice or screenshot"),h("p",{class:"m"},"Text, PDF (images need OCR configured on the server). Max 5 MB. Found dates become proposed tasks you approve."),f,h("div",{style:"margin-top:10px"},h("button",{class:"pri",on:{click:act(async()=>{if(!f.files[0])return;const b=new FormData();b.append("file",f.files[0]);const r=await api("/documents",{method:"POST",body:b});say(`${r.filename}: ${r.facts_found} item(s) found. ${r.note}`)})}},"Upload"))))}};
+
+const NS="http://www.w3.org/2000/svg",sv=(t,a={},...k)=>{const e=document.createElementNS(NS,t);for(const[x,v]of Object.entries(a))e.setAttribute(x,v);k.forEach(c=>e.append(c));return e};
+Object.assign(V,{
+async inbox(){const e=await api("/emails");if(!e.length)return h("div",{class:"c"},h("h3",{},"No emails yet"),h("p",{class:"m"},"Synced mail appears here with the dates and deadlines LifeMesh found."));
+return h("div",{},e.map(x=>h("div",{class:"c"},x.risk?h("span",{class:"pill b"},"review"):"",x.tags.map(t=>h("span",{class:"pill"},t)),h("b",{},x.subject||"(no subject)"),h("div",{class:"m"},x.sender+" · "+fmt(x.received_at)),h("div",{class:"m"},x.snippet))))},
+async calendar(){const ev=await api("/events?days=7");if(!ev.length)return h("div",{class:"c"},h("h3",{},"No upcoming events"),h("p",{class:"m"},"Connect a calendar in Integrations to see the next 7 days."));
+const days={};ev.forEach(x=>{const k=new Date(x.starts_at).toDateString();(days[k]=days[k]||[]).push(x)});
+const clash=(a,b)=>new Date(a.starts_at)<new Date(b.ends_at)&&new Date(b.starts_at)<new Date(a.ends_at);
+return h("div",{},Object.entries(days).map(([d,list])=>h("div",{class:"c"},h("h3",{},d),list.map((x,i)=>{const bad=list.some((y,j)=>i!==j&&clash(x,y));return h("div",{style:"padding:4px 0"},bad?h("span",{class:"pill w"},"conflict"):"",new Date(x.starts_at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})+"–"+new Date(x.ends_at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})+"  ",h("b",{},x.title),x.location?h("span",{class:"m"}," · "+x.location):"")}))))},
+async graph(){const g=await api("/graph");if(!g.nodes.length)return h("div",{class:"c"},h("h3",{},"Graph is empty"),h("p",{class:"m"},"It fills as facts are extracted from emails and documents. Every node links to its source."));
+const cols={email:80,document:80,fact:400,task:720},rows={0:0,1:0,2:0},pos={};
+const colOf=n=>n.type==="fact"?1:n.type==="task"?2:0;g.nodes.forEach(n=>{const c=colOf(n);pos[n.id]={x:cols[n.type],y:40+rows[c]++*62,n}});
+const H=Math.max(...Object.values(rows))*62+60,info=h("div",{class:"c"},h("span",{class:"m"},"Select a node to see its evidence and version."));
+const show=n=>info.replaceChildren(h("span",{class:"pill "+(n.type==="fact"&&!n.current?"b":"g")},n.type+(n.type==="fact"?(n.current?" · current":" · superseded"):"")),h("b",{},n.label),n.value?h("div",{},fmt(n.value)):"",n.evidence?h("div",{class:"m"},"Evidence: “"+n.evidence+"”"):"",n.at?h("div",{class:"m"},"Recorded "+fmt(n.at)):"");
+const svg=sv("svg",{viewBox:`0 0 800 ${H}`,role:"img","aria-label":"Context graph",style:"width:100%;background:var(--p);border-radius:12px"});
+g.edges.forEach(([a,b,k])=>{if(pos[a]&&pos[b])svg.append(sv("line",{x1:pos[a].x,y1:pos[a].y,x2:pos[b].x,y2:pos[b].y,stroke:k==="supersedes"?"#ff5d7a":"rgba(150,170,255,.45)","stroke-dasharray":k==="supersedes"?"5 4":"0"}))});
+Object.values(pos).forEach(({x,y,n})=>{const gr=sv("g",{tabindex:"0",role:"button","aria-label":n.type+" "+n.label,style:"cursor:pointer"},sv("circle",{cx:x,cy:y,r:16,fill:n.type==="fact"?(n.current?"#4d7cff":"#6b7280"):n.type==="task"?"#3ddc97":"#9a6bff"}),(()=>{const t=sv("text",{x,y:y+30,style:"fill:var(--tx)","font-size":"11","text-anchor":"middle"});t.textContent=n.label;return t})());
+gr.addEventListener("click",()=>show(n));gr.addEventListener("keydown",e=>e.key==="Enter"&&show(n));svg.append(gr)});
+return h("div",{},svg,h("p",{class:"m"},"Left: source emails and documents. Middle: extracted facts (dashed red line = replaced by a newer version). Right: linked tasks."),info)},
+async privacy(){const a=await api("/audit");return h("div",{},h("div",{class:"c"},h("h3",{},"Your data"),h("p",{class:"m"},"LifeMesh requests read-only access. It cannot send mail or change your calendar. You can export everything or delete your account (top right)."),h("a",{href:"/export",download:"lifemesh-export.json"},"Download my data")),
+h("div",{class:"c"},h("h3",{},"Activity log"),a.length?a.map(x=>h("div",{class:"m"},fmt(x.at)+" · "+x.action)):h("span",{class:"m"},"No activity yet.")))}});
+const TABS=[["brief","Briefing"],["inbox","Inbox"],["calendar","Calendar"],["alerts","Alerts"],["tasks","Tasks"],["graph","Graph"],["ask","Ask"],["docs","Documents"],["integ","Integrations"],["privacy","Privacy"]];
+async function render(){const app=$("app"),top=$("top");
+if(!me){top.replaceChildren();app.replaceChildren(auth());return}
+top.replaceChildren(h("a",{href:"/export",download:"lifemesh-export.json",class:"m"},"Export data"),h("button",{on:{click:act(async()=>{await api("/auth/logout",{method:"POST"});me=false})}},"Sign out"),
+h("button",{class:"bad",on:{click:act(async()=>{if(confirm("Permanently delete your account and all data?")){await api("/account",{method:"DELETE"});me=false}})}},"Delete account"));
+const ti=TABS.findIndex(x=>x[0]===tab);$("shape").dataset.f=ti%4;
+const tabs=h("div",{class:"tabs",role:"tablist"},TABS.map(([k,l],i)=>h("button",{class:"tab",role:"tab","aria-selected":String(tab===k),on:{click:()=>{tab=k;render()}}},h("span",{class:"ix","aria-hidden":"true"},"1."+(i+1)),l)));
+const head=()=>[h("span",{class:"lb",style:"display:block;margin-top:22px"},"(Section 1."+(ti+1)+")"),h("h2",{class:"hd d",style:"margin-top:6px"},TABS[ti][1])];
+try{app.replaceChildren(tabs,h("div",{class:"view"},...head(),await V[tab]()))}catch(e){if(/Not signed in/.test(e.message)){me=false;return render()}app.replaceChildren(tabs,h("div",{class:"view"},...head(),h("div",{class:"c"},e.message)))}}
+(async()=>{const q=new URLSearchParams(location.search);try{await api("/tasks");me=true}catch{}
+if(q.get("connected"))say("Connected: "+q.get("connected"));if(q.get("integration_error"))say("Connection failed: "+q.get("integration_error"));if(q.has("connected"))tab="integ";render()})();
+const cu=$("cur");let mx=0,my=0,cx=0,cy=0;addEventListener("pointermove",e=>{mx=e.clientX;my=e.clientY});(function f(){cx+=(mx-cx)*.2;cy+=(my-cy)*.2;cu.style.transform=`translate(${cx}px,${cy}px)`;requestAnimationFrame(f)})();
+</script></body></html>
